@@ -1,0 +1,21 @@
+technician_id,name,plant_id,skill_level,hourly_rate,max_hours_per_week
+1,Tech 01 (synthetic),1,SENIOR,41.27,40
+2,Tech 02 (synthetic),2,SENIOR,44.37,40
+3,Tech 03 (synthetic),3,Junior,17.89,40
+4,Tech 04 (synthetic),4,Senior,45.43,40
+5,Tech 05 (synthetic),5,Junior,15.53,40
+6,Tech 06 (synthetic),1,Mid,29.45,40
+7,  Tech 07 (synthetic)  ,2,Mid,28.67,40
+8,Tech 08 (synthetic),3,Mid,24.20,40
+9,Tech 09 (synthetic),4,Mid,22.98,40
+10,Tech 10 (synthetic),5,Senior,43.58,40
+11,Tech 11 (synthetic),1,Senior,40.25,40
+12,Tech 12 (synthetic),2,senior,46.72,40
+13,  Tech 13 (synthetic)  ,3,Senior,38.34,40
+14,Tech 14 (synthetic),4,Mid,22.83,40
+15,Tech 15 (synthetic),5,Junior,16.57,40
+16,Tech 16 (synthetic),1,Mid,29.76,40
+17,Tech 17 (synthetic),2,Junior,15.17,40
+18,  Tech 18 (synthetic)  ,3,Mid,23.92,40
+19,Tech 19 (synthetic),4,junior,15.64,40
+20,Tech 20 (synthetic),5,Junior,16.51,40
