@@ -1,20 +1,71 @@
+
+# Python virtual environments
 .venv/
 venv/
 __pycache__/
 *.pyc
 
+# Environment variables and credentials
 .env
 .env.*
 !.env.example
 
+# Raw data
 data/raw/*.txt
 
+# SQL Server database files and backups
 *.bak
 *.mdf
 *.ldf
 
+# Jupyter and Python cache
 .ipynb_checkpoints/
 .pytest_cache/
 
+# Power BI local/cache files
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/unappliedChanges.json
+
+# Obsolete Power BI project (keep locally)
+# Uncomment only if confirmed unnecessary
+# /powerbi/PredMaint_Fixed_Project_old/
+
+# Temporary files
+*.tmp
+*.log
+
+# OS-generated files
 .DS_Store
 Thumbs.db
+
+
+# Power BI temporary files
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/unappliedChanges.json
+
+# Microsoft Office temporary lock files
+~$*
+
+# Old Power BI project backup
+/powerbi/PredMaint_Fixed_Project_old/
+
+# Temporary files
+*.tmp
+*.log
+
+
+# Legacy Power BI CSV datasets
+/powerbi/PredMaint_Fixed_Project_New/Datasets/
+
+# Old Power BI project backup
+/powerbi/PredMaint_Fixed_Project_old/
+
+# Power BI temporary files
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/unappliedChanges.json
+
+# Office temporary lock files
+~$*
