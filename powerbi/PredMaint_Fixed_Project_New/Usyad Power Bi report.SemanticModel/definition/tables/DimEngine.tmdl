@@ -1,0 +1,85 @@
+table DimEngine
+	lineageTag: 4a28fb7d-dae3-449a-a3b6-2f9c40aa153e
+
+	column engine_key
+		dataType: int64
+		lineageTag: abf2b431-d122-431c-a0b7-2c04a4615006
+		summarizeBy: none
+		sourceColumn: engine_key
+
+		changedProperty = IsHidden
+
+	column engine_uid
+		dataType: int64
+		lineageTag: c1b3691e-a78e-48f2-83de-f4c2c1deb270
+		summarizeBy: none
+		sourceColumn: engine_uid
+
+		changedProperty = IsHidden
+
+	column engine_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 576c4586-8cd9-463b-a171-9856f205e990
+		summarizeBy: none
+		sourceColumn: engine_id
+
+		changedProperty = IsHidden
+
+	column split
+		dataType: string
+		lineageTag: 80d57949-2a16-4712-9e2f-5350ffcec493
+		sourceColumn: split
+
+		changedProperty = IsHidden
+
+	column plant_id
+		dataType: int64
+		lineageTag: 263ac17e-2e3b-43fc-8171-2634c91254c1
+		summarizeBy: none
+		sourceColumn: plant_id
+
+		changedProperty = IsHidden
+
+	column commission_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 5f121967-08cd-476a-a1ac-614129b6557a
+		summarizeBy: none
+		sourceColumn: commission_date
+
+		changedProperty = IsHidden
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimEngine = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(
+				        "USAYD-PC\SQLEXPRESS",
+				        "PredMaintDW"
+				    ),
+				    DimEngine = Source{[Schema="mart", Item="DimEngine"]}[Data],
+				    #"Changed column type" = Table.TransformColumnTypes(
+				        DimEngine,
+				        {
+				            {"engine_key", Int64.Type},
+				            {"engine_uid", Int64.Type},
+				            {"engine_id", Int64.Type},
+				            {"split", type text},
+				            {"plant_id", Int64.Type},
+				            {"commission_date", type date}
+				        },
+				        "en-US"
+				    ),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Changed column type",{"engine_key", "engine_uid", "engine_id", "split", "plant_id", "commission_date"})
+				in
+				    #"Removed Other Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

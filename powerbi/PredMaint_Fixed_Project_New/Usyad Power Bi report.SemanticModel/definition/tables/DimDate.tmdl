@@ -1,0 +1,119 @@
+table DimDate
+	lineageTag: 2708cc3c-0371-4a5c-9062-491efa88fd4b
+	dataCategory: Time
+
+	column date_key
+		dataType: int64
+		lineageTag: aca7b4fc-e50b-41ff-8716-1b8de717efb6
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+	column full_date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: e0529076-5997-45e5-bbd7-ae1fdf747cff
+		summarizeBy: none
+		sourceColumn: full_date
+
+		changedProperty = IsHidden
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 7d251cc4-b89a-4b4d-8ae1-ccf64c5532f4
+		summarizeBy: none
+		sourceColumn: day_number
+
+		changedProperty = IsHidden
+
+	column month_number
+		dataType: int64
+		lineageTag: ec2c528b-c68c-414e-a891-ac5afa224226
+		summarizeBy: none
+		sourceColumn: month_number
+
+		changedProperty = IsHidden
+
+	column month_name
+		dataType: string
+		lineageTag: 797a8be7-083a-412d-ab5d-8f9fc29d4e39
+		sourceColumn: month_name
+		sortByColumn: month_number
+
+		changedProperty = IsHidden
+
+	column quarter_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 25c4e8d1-3281-4bde-ae66-f419ee0848df
+		summarizeBy: none
+		sourceColumn: quarter_number
+
+		changedProperty = IsHidden
+
+	column year_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 72b0e32c-1bee-4490-bbbb-94618c597211
+		summarizeBy: none
+		sourceColumn: year_number
+
+		changedProperty = IsHidden
+
+	column year_month
+		dataType: string
+		lineageTag: 2b075e70-24f7-49e6-bb1f-395b5120b5e5
+		sourceColumn: year_month
+
+		changedProperty = IsHidden
+
+	column weekday_name
+		dataType: string
+		lineageTag: 17405f48-4ef2-4165-96e1-67187634706a
+		sourceColumn: weekday_name
+
+		changedProperty = IsHidden
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="DimDate"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    ),
+				    #"Changed Type" = Table.TransformColumnTypes(
+				        #"Removed Navigation",
+				        {{"full_date", type date}}
+				    ),
+				    #"Added Year Month" = Table.AddColumn(
+				        #"Changed Type",
+				        "year_month",
+				        each Date.ToText([full_date], "yyyy-MM"),
+				        type text
+				    ),
+				    #"Added Weekday Name" = Table.AddColumn(
+				        #"Added Year Month",
+				        "weekday_name",
+				        each Date.DayOfWeekName([full_date], "en-US"),
+				        type text
+				    )
+				in
+				    #"Added Weekday Name"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

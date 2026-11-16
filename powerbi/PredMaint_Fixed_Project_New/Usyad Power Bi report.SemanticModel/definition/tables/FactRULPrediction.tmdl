@@ -1,0 +1,87 @@
+table FactRULPrediction
+	lineageTag: ab79b01d-0f78-4412-a983-31debe82dd30
+
+	column prediction_fact_key
+		dataType: int64
+		lineageTag: a6ec59d6-9122-4b43-9a5a-1e8d1e5ad374
+		summarizeBy: none
+		sourceColumn: prediction_fact_key
+
+		changedProperty = IsHidden
+
+	column run_key
+		dataType: int64
+		lineageTag: 1eef0187-d750-412b-abdd-8186544e0f87
+		summarizeBy: none
+		sourceColumn: run_key
+
+		changedProperty = IsHidden
+
+	column engine_key
+		dataType: int64
+		lineageTag: fe23f328-724a-45cd-8282-5ae784243939
+		summarizeBy: none
+		sourceColumn: engine_key
+
+		changedProperty = IsHidden
+
+	column model_key
+		dataType: int64
+		lineageTag: 844bdf4e-86e3-48c3-9777-5495c7596d45
+		summarizeBy: none
+		sourceColumn: model_key
+
+		changedProperty = IsHidden
+
+	column date_key
+		dataType: int64
+		lineageTag: 503eb800-14cf-4c94-8b48-b0f5bd615865
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+	column predicted_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6aec1504-4a1b-4412-9638-51803d7000b5
+		sourceColumn: predicted_at
+
+		changedProperty = IsHidden
+
+	column predicted_rul
+		dataType: double
+		formatString: 0.0
+		lineageTag: c35bc04c-3eb9-44e4-9807-0ca6f6ace87f
+		sourceColumn: predicted_rul
+
+		changedProperty = IsHidden
+
+	column failure_prob_30
+		dataType: double
+		formatString: 0.0%
+		lineageTag: b548ce2d-3b6a-4246-b50f-930fa1d77880
+		sourceColumn: failure_prob_30
+
+		changedProperty = IsHidden
+
+	partition FactRULPrediction = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="FactRULPrediction"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    )
+				in
+				    #"Removed Navigation"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

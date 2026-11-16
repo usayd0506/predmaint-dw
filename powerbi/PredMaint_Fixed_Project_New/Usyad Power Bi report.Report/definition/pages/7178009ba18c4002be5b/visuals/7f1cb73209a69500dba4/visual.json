@@ -1,0 +1,85 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "7f1cb73209a69500dba4",
+  "position": {
+    "x": 1120,
+    "y": 265,
+    "z": 12000,
+    "height": 380,
+    "width": 750,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "GA_Convergence"
+                    }
+                  },
+                  "Property": "generation"
+                }
+              },
+              "queryRef": "GA_Convergence.generation",
+              "nativeQueryRef": "generation",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "GA_Convergence"
+                        }
+                      },
+                      "Property": "best_fitness"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(GA_Convergence.best_fitness)",
+              "nativeQueryRef": "Sum of best_fitness"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Aggregation": {
+                "Expression": {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "GA_Convergence"
+                      }
+                    },
+                    "Property": "best_fitness"
+                  }
+                },
+                "Function": 0
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

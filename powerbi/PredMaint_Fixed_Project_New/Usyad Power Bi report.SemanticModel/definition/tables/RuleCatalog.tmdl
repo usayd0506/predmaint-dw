@@ -1,0 +1,22 @@
+table RuleCatalog
+	lineageTag: 1b856132-b89f-49df-908c-2c135ce2678f
+
+	column rule_id
+		dataType: string
+		lineageTag: 4014794c-b0b1-4051-a09c-7874f6489e10
+		sourceColumn: rule_id
+
+		changedProperty = IsHidden
+
+	partition RuleCatalog = m
+		mode: import
+		source =
+				let
+				  Source = #table(type table [rule_id = text], {{"R1"}, {"R2"}, {"R3"}, {"R4"}, {"R5"}, {"R6"}})
+				in
+				  Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

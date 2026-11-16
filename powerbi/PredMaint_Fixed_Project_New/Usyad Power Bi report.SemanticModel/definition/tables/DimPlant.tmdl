@@ -1,0 +1,97 @@
+table DimPlant
+	lineageTag: fe28a98f-4f4c-419b-a48c-b4f9eb6cc288
+
+	column plant_key
+		dataType: int64
+		lineageTag: f7be8a7d-d735-4bbb-a194-9ec4ae4f3ebb
+		summarizeBy: none
+		sourceColumn: plant_key
+
+		changedProperty = IsHidden
+
+	column plant_id
+		dataType: int64
+		lineageTag: a5e18582-9665-48c1-9bc7-7cefa05fbe3b
+		summarizeBy: none
+		sourceColumn: plant_id
+
+		changedProperty = IsHidden
+
+	column plant_name
+		dataType: string
+		lineageTag: 62d7c8d0-77a0-4896-abb0-07c7437fca42
+		sourceColumn: plant_name
+
+		changedProperty = IsHidden
+
+	column city
+		dataType: string
+		lineageTag: b8e36538-931e-4c5f-9fe4-c24449487213
+		dataCategory: City
+		sourceColumn: city
+
+		changedProperty = IsHidden
+
+	column province
+		dataType: string
+		lineageTag: cac4a55d-b101-4135-844f-72c43ae96aeb
+		dataCategory: StateOrProvince
+		sourceColumn: province
+
+		changedProperty = IsHidden
+
+	column country
+		dataType: string
+		lineageTag: f3a6ef76-1097-4156-9339-6a10bb854e0a
+		dataCategory: Country
+		sourceColumn: country
+
+		changedProperty = IsHidden
+
+	column latitude
+		dataType: double
+		lineageTag: 2cb4cc16-11a9-4b4c-9130-b8da21209ac2
+		dataCategory: Latitude
+		summarizeBy: none
+		sourceColumn: latitude
+
+		changedProperty = IsHidden
+
+	column longitude
+		dataType: double
+		lineageTag: d2e26e44-f55a-4d78-bb77-05e563a6c4d1
+		dataCategory: Longitude
+		summarizeBy: none
+		sourceColumn: longitude
+
+		changedProperty = IsHidden
+
+	partition DimPlant = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(
+				        "USAYD-PC\SQLEXPRESS",
+				        "PredMaintDW"
+				    ),
+				    DimPlant = Source{[Schema="mart", Item="DimPlant"]}[Data],
+				    #"Selected Columns" = Table.SelectColumns(
+				        DimPlant,
+				        {
+				            "plant_key",
+				            "plant_id",
+				            "plant_name",
+				            "city",
+				            "province",
+				            "country",
+				            "latitude",
+				            "longitude"
+				        }
+				    )
+				in
+				    #"Selected Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

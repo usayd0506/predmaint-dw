@@ -1,0 +1,118 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "4521f9be238200502632",
+  "position": {
+    "x": 1206,
+    "y": 800,
+    "z": 17000,
+    "height": 250,
+    "width": 672,
+    "tabOrder": 17000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactEngineHealth"
+                    }
+                  },
+                  "Property": "risk_level"
+                }
+              },
+              "queryRef": "FactEngineHealth.risk_level",
+              "nativeQueryRef": "risk_level"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactEngineHealth"
+                    }
+                  },
+                  "Property": "cycles_run"
+                }
+              },
+              "queryRef": "Sum(FactEngineHealth.cycles_run)",
+              "nativeQueryRef": "cycles_run",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactEngineHealth"
+                    }
+                  },
+                  "Property": "health_index"
+                }
+              },
+              "queryRef": "Sum(FactEngineHealth.health_index)",
+              "nativeQueryRef": "health_index"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "bubbles": [
+        {
+          "properties": {
+            "bubbleSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "-6L"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cycles Vs Health Index'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

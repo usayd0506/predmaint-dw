@@ -1,0 +1,38 @@
+table DimMethod
+	lineageTag: 2c113000-236f-41ac-9dc9-fd36e363ddf0
+
+	column method_key
+		dataType: int64
+		lineageTag: 18abfd6a-96d5-4c27-86db-d282760fe15f
+		summarizeBy: none
+		sourceColumn: method_key
+
+		changedProperty = IsHidden
+
+	column method_name
+		dataType: string
+		lineageTag: 40bd8735-8595-41f6-bae7-7d89c08cf6c3
+		sourceColumn: method_name
+
+		changedProperty = IsHidden
+
+	partition DimMethod = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="DimMethod"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    )
+				in
+				    #"Removed Navigation"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

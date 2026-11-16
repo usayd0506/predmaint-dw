@@ -1,0 +1,103 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "4c6a46d72769a0cab004",
+  "position": {
+    "x": 284,
+    "y": 800,
+    "z": 16000,
+    "height": 250,
+    "width": 676,
+    "tabOrder": 16000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactEngineHealth"
+                    }
+                  },
+                  "Property": "Health Index Bin"
+                }
+              },
+              "queryRef": "FactEngineHealth.Health Index Bin",
+              "nativeQueryRef": "Health Index Bin",
+              "active": true
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactEngineHealth"
+                    }
+                  },
+                  "Property": "risk_level"
+                }
+              },
+              "queryRef": "FactEngineHealth.risk_level",
+              "nativeQueryRef": "risk_level"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Engines"
+                }
+              },
+              "queryRef": "_Measures.Total Engines",
+              "nativeQueryRef": "Total Engines"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Health Index Distribution'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

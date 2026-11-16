@@ -1,0 +1,69 @@
+table DimRun
+	lineageTag: 513549a4-6528-49f7-8217-90894bd295de
+
+	column run_key
+		dataType: int64
+		lineageTag: 4b15203a-5e72-409f-bdac-8dff106f5f0c
+		summarizeBy: none
+		sourceColumn: run_key
+
+		changedProperty = IsHidden
+
+	column run_id
+		dataType: string
+		lineageTag: d8a8a5ed-2f73-47fd-b76f-4711ba9fb1d4
+		sourceColumn: run_id
+
+		changedProperty = IsHidden
+
+	column bronze_batch_id
+		dataType: string
+		lineageTag: 50f8c74c-61d2-4ced-9d14-5db59677799b
+		sourceColumn: bronze_batch_id
+
+		changedProperty = IsHidden
+
+	column source_version
+		dataType: string
+		lineageTag: 7c8ef6d6-823d-4055-8c9a-426940658731
+		sourceColumn: source_version
+
+		changedProperty = IsHidden
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 02a7a4cb-26b6-437f-9aa3-c0ea31b9d5e0
+		sourceColumn: created_at
+
+		changedProperty = IsHidden
+
+	column status
+		dataType: string
+		lineageTag: 1a4926d3-ef43-4146-ab83-80e4e775dace
+		sourceColumn: status
+
+		changedProperty = IsHidden
+
+	partition DimRun = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="DimRun"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    )
+				in
+				    #"Removed Navigation"
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

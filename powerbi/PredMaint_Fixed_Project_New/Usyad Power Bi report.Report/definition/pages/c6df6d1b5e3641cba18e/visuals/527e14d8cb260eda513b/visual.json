@@ -1,0 +1,47 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "527e14d8cb260eda513b",
+  "position": {
+    "x": 1364.2343149613473,
+    "y": 153.03312425011009,
+    "z": 9000,
+    "height": 76.516562125055046,
+    "width": 513.22084352171066,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactEngineHealth"
+                    }
+                  },
+                  "Property": "degradation_stage"
+                }
+              },
+              "queryRef": "FactEngineHealth.degradation_stage",
+              "nativeQueryRef": "Degradation Stage",
+              "active": true,
+              "displayName": "Degradation Stage"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "general": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

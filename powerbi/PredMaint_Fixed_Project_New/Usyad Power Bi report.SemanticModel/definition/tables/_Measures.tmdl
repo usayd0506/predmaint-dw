@@ -1,0 +1,950 @@
+table _Measures
+	lineageTag: 4d118ef2-4908-4acd-8eed-0dbd7de4273e
+
+	measure 'Total Engines' =
+			
+			DISTINCTCOUNT(FactEngineHealth[engine_key])
+		formatString: 0
+		lineageTag: e4b9abee-695e-402c-9551-cc4f30a6729a
+
+	measure 'Critical Engines' =
+			
+			CALCULATE(
+			    [Total Engines],
+			    FactEngineHealth[risk_level] = "Critical"
+			)
+		formatString: 0
+		lineageTag: b08dc2d0-8c54-4766-8bfd-819f47f90cbb
+
+	measure 'At-Risk %' =
+			
+			DIVIDE(
+			    CALCULATE(
+			        [Total Engines],
+			        FactEngineHealth[risk_level] IN {"Critical", "Warning"}
+			    ),
+			    [Total Engines],
+			    0
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 4f3793fa-c426-44b2-8706-2fe36d286a98
+
+	measure 'Total Alerts' =
+			
+			COUNTROWS(FactAlert)
+		formatString: 0
+		lineageTag: 9a1ff793-9a9d-4c8e-a71b-b72eb12f47e4
+
+	measure 'Engines With Alert' =
+			
+			DISTINCTCOUNT(FactAlert[engine_key])
+		formatString: 0
+		lineageTag: 8e7617e7-a629-4a1f-a3b7-7cfe046b706e
+
+	measure 'Avg Health Index' =
+			
+			AVERAGE(FactEngineHealth[health_index])
+		lineageTag: f1c91b47-4e2e-4fa6-9343-732d3f9ee9bb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Min Predicted RUL' =
+			
+			MIN(FactRULPrediction[predicted_rul])
+		lineageTag: ca41323a-d030-483e-8463-8a97c9bed1b1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Maintenance Cost' =
+			
+			SUM(FactMaintenance[maintenance_cost])
+		lineageTag: a053e470-93d6-4b0b-8bc1-348a008dff93
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Estimated Cost Avoided' =
+			
+			BLANK()
+		formatString: 0
+		lineageTag: 1be76b5d-fddb-4499-994e-8f0fa652c47e
+
+	measure 'Labor Cost Saving %' =
+			
+			
+			DIVIDE(
+			    [Greedy Labor Cost] - [GA Labor Cost],
+			    [Greedy Labor Cost]
+			)
+		formatString: 0
+		lineageTag: f68868eb-8f05-4e29-8dfe-4fc187d1b6ea
+
+	measure 'GA Labor Cost' =
+			
+			CALCULATE(
+			    AVERAGE(FactModelMetric[metric_value]),
+			    DimModel[model_name] = "GA",
+			    FactModelMetric[metric_name] = "labor_cost"
+			)
+		lineageTag: 946ae80e-8cbe-47a4-9ac1-de707a9102f4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Greedy Labor Cost' =
+			
+			CALCULATE(
+			    AVERAGE(FactModelMetric[metric_value]),
+			    DimModel[model_name] = "GREEDY",
+			    FactModelMetric[metric_name] = "labor_cost"
+			)
+		lineageTag: ca39e5b2-9939-4f3f-9d9b-002bc02f6228
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Headline Executive' =
+			
+			FORMAT([Critical Engines], "0") &
+			" of " &
+			FORMAT([Total Engines], "0") &
+			" engines are currently critical and require priority attention."
+		lineageTag: 8a226a58-759b-4606-a517-3234eaf77f60
+
+	measure 'Lowest RUL Rank' =
+			
+			RANKX(
+			    FILTER(
+			        ALLSELECTED(DimEngine[engine_key]),
+			        NOT ISBLANK([Min Predicted RUL])
+			    ),
+			    [Min Predicted RUL],
+			    ,
+			    ASC,
+			    DENSE
+			)
+		formatString: 0
+		lineageTag: 3aeeac1f-0d8a-40bd-89ca-60334286e0fc
+
+	measure 'Avg Cycles Run' =
+			
+			AVERAGE(FactEngineHealth[cycles_run])
+		lineageTag: d22efcb7-a339-4902-a4da-98aebd265611
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Days Since Maintenance' =
+			
+			AVERAGEX(
+			    FILTER(
+			        FactEngineHealth,
+			        NOT ISBLANK(FactEngineHealth[last_maintenance])
+			    ),
+			    VAR SnapshotDate =
+			        LOOKUPVALUE(
+			            DimDate[full_date],
+			            DimDate[date_key],
+			            FactEngineHealth[date_key]
+			        )
+			    RETURN
+			        IF(
+			            NOT ISBLANK(SnapshotDate) &&
+			            SnapshotDate >= FactEngineHealth[last_maintenance],
+			            DATEDIFF(
+			                FactEngineHealth[last_maintenance],
+			                SnapshotDate,
+			                DAY
+			            )
+			        )
+			)
+		lineageTag: 0187f1d5-b877-42b5-bcf1-aa9d3404f183
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Engines Never Maintained' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(FactEngineHealth[engine_key]),
+			    ISBLANK(FactEngineHealth[last_maintenance])
+			)
+		formatString: 0
+		lineageTag: 94a9f980-45e0-447f-b98d-3164a1a05eb1
+
+	measure 'Avg Predicted RUL' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactRULPrediction[predicted_rul] ),
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: #,0.0
+		displayFolder: 03 Watchlist
+		lineageTag: 8a8dccb5-ac4b-4a5e-b4f4-4b26ae919a88
+
+	measure 'Avg Failure Prob 30d' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactRULPrediction[failure_prob_30] ),
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0.0%
+		displayFolder: 03 Watchlist
+		lineageTag: 0f619281-250d-4a1d-88e3-11048169d5e5
+
+	measure 'Engines RUL under 30' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    DISTINCTCOUNT ( FactRULPrediction[engine_key] ),
+			    FactRULPrediction[predicted_rul] < 30,
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 03 Watchlist
+		lineageTag: d6a67110-bad3-4c7e-9cc7-8e4248352fb8
+
+	measure 'Engines Prob over 70%' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    DISTINCTCOUNT ( FactRULPrediction[engine_key] ),
+			    FactRULPrediction[failure_prob_30] > 0.7,
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 03 Watchlist
+		lineageTag: dac4a8c3-563f-4f2e-8acc-3d722bfed660
+
+	measure 'Expected Failures 30d' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    SUM ( FactRULPrediction[failure_prob_30] ),
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: #,0.00
+		displayFolder: 03 Watchlist
+		lineageTag: b924ec07-4d29-4a7a-aa3b-4abaf719cfa0
+
+	measure 'Critical Alerts' = ```
+			
+			CALCULATE (
+			    [Total Alerts],
+			    FactAlert[severity] = "Critical"
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 04 Alerts
+		lineageTag: 7f0eb362-178b-48b7-832b-6cddfbb4a6c0
+
+	measure 'Alert Coverage %' = ```
+			
+			DIVIDE ( [Engines With Alert], [Total Engines], 0 )
+			
+			```
+		formatString: 0.00%
+		displayFolder: 04 Alerts
+		lineageTag: 033d355f-20d6-45ed-8fa2-fcf839db75ac
+
+	measure 'Rule Hits' = ```
+			
+			VAR RuleId = SELECTEDVALUE ( RuleCatalog[rule_id] )
+			RETURN
+			IF (
+			    ISBLANK ( RuleId ),
+			    BLANK (),
+			    CALCULATE (
+			        COUNTROWS ( FactAlert ),
+			        FILTER (
+			            FactAlert,
+			            CONTAINSSTRING (
+			                "," & SUBSTITUTE ( FactAlert[rules_fired], " ", "" ) & ",",
+			                "," & RuleId & ","
+			            )
+			        )
+			    )
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 04 Alerts
+		lineageTag: a24ebea3-407a-4037-941f-13877edd09aa
+
+	measure 'Work Orders' = ```
+			
+			DISTINCTCOUNT ( FactMaintenance[work_order_id] )
+			
+			```
+		formatString: 0
+		displayFolder: 05 Maintenance
+		lineageTag: b81313c8-8387-445b-a4f5-6eba9679e14e
+
+	measure 'Total Maintenance Hours' = ```
+			
+			SUM ( FactMaintenance[duration_hours] )
+			
+			```
+		formatString: #,0.0
+		displayFolder: 05 Maintenance
+		lineageTag: 6b6759a0-b76e-4c37-819f-2ad068295c12
+
+	measure 'Avg Cost per Work Order' = ```
+			
+			DIVIDE ( [Total Maintenance Cost], [Work Orders], 0 )
+			
+			```
+		formatString: $#,0.00
+		displayFolder: 05 Maintenance
+		lineageTag: 8b4ad111-5064-431c-9095-ab5cfe1b106b
+
+	measure 'Corrective Cost %' = ```
+			
+			DIVIDE (
+			    CALCULATE (
+			        [Total Maintenance Cost],
+			        FactMaintenance[maintenance_type] IN { "Repair", "Replacement" }
+			    ),
+			    [Total Maintenance Cost],
+			    0
+			)
+			
+			```
+		formatString: 0.00%
+		displayFolder: 05 Maintenance
+		lineageTag: b735e97e-2291-4a48-bcb2-442b70308bbb
+
+	measure 'GA Travel km' = ```
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    DimModel[model_name] = "GA",
+			    FactModelMetric[metric_name] = "travel_km"
+			)
+			
+			```
+		formatString: #,0.0
+		displayFolder: 06 Scheduling\Helpers
+		lineageTag: e8bba2f3-5410-4f08-9456-e1d46afb7864
+
+	measure 'Greedy Travel km' = ```
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    DimModel[model_name] = "GREEDY",
+			    FactModelMetric[metric_name] = "travel_km"
+			)
+			
+			```
+		formatString: #,0.0
+		displayFolder: 06 Scheduling\Helpers
+		lineageTag: 2bbf745a-817c-4fc0-8aac-cf5069cbef2d
+
+	measure 'Travel km Saved' = ```
+			
+			[Greedy Travel km] - [GA Travel km]
+			
+			```
+		formatString: #,0.0
+		displayFolder: 06 Scheduling
+		lineageTag: d42f28cc-a841-4583-9b29-97160b611728
+
+	measure 'GA Fitness' = ```
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    DimModel[model_name] = "GA",
+			    FactModelMetric[metric_name] = "fitness"
+			)
+			
+			```
+		formatString: #,0.0
+		displayFolder: 06 Scheduling\Helpers
+		lineageTag: a397ab6e-9aa1-4860-b6a4-cf747c630b5e
+
+	measure 'Greedy Fitness' = ```
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    DimModel[model_name] = "GREEDY",
+			    FactModelMetric[metric_name] = "fitness"
+			)
+			
+			```
+		formatString: #,0.0
+		displayFolder: 06 Scheduling\Helpers
+		lineageTag: b9917c31-0c03-4b5e-a88a-b9d7fbff3eb6
+
+	measure 'Fitness Improvement %' = ```
+			
+			DIVIDE (
+			    [Greedy Fitness] - [GA Fitness],
+			    [Greedy Fitness],
+			    0
+			)
+			
+			```
+		formatString: 0.00%
+		displayFolder: 06 Scheduling
+		lineageTag: 5d323398-b7df-4b2f-8c6d-d0c750e767c1
+
+	measure 'Scheduled Hours' = ```
+			
+			SUM ( FactSchedule[slot_hours] )
+			
+			```
+		formatString: #,0.0
+		displayFolder: 06 Scheduling
+		lineageTag: 6303b681-0fcc-47b1-a41e-e74d54a57d0f
+
+	measure 'Scheduled Jobs' = ```
+			
+			SUM ( FactSchedule[assignment_count] )
+			
+			```
+		formatString: 0
+		displayFolder: 06 Scheduling
+		lineageTag: 113808b3-f29e-41f4-9299-caeb587047ac
+
+	measure 'Technician Utilization %' = ```
+			
+			VAR ScheduledHrs =
+			    CALCULATE (
+			        [Scheduled Hours],
+			        DimMethod[method_name] = "GA"
+			    )
+			VAR CapacityPerWeek =
+			    SUMX (
+			        ALL ( DimTechnician ),
+			        DimTechnician[max_hours_per_week]
+			    )
+			VAR MinSlot =
+			    CALCULATE (
+			        MIN ( FactSchedule[slot_start] ),
+			        DimMethod[method_name] = "GA"
+			    )
+			VAR MaxSlot =
+			    CALCULATE (
+			        MAX ( FactSchedule[slot_start] ),
+			        DimMethod[method_name] = "GA"
+			    )
+			VAR DaySpan =
+			    IF (
+			        ISBLANK ( MinSlot ) || ISBLANK ( MaxSlot ),
+			        BLANK (),
+			        DATEDIFF ( MinSlot, MaxSlot, DAY )
+			    )
+			VAR WeekCount =
+			    IF ( ISBLANK ( DaySpan ), BLANK (), MAX ( 1, INT ( DIVIDE ( DaySpan, 7 ) ) + 1 ) )
+			RETURN
+			DIVIDE ( ScheduledHrs, CapacityPerWeek * WeekCount, 0 )
+			
+			```
+		formatString: 0.00%
+		displayFolder: 06 Scheduling
+		lineageTag: 366c0096-ef41-4014-a869-4deb2f9f7f0b
+
+	measure 'XGB RMSE' = ```
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    DimModel[model_name] = "XGBoost",
+			    FactModelMetric[metric_name] = "test_rmse_true"
+			)
+			
+			```
+		formatString: #,0.000
+		displayFolder: 07 Model Performance
+		lineageTag: 14579917-99a1-44ae-a38a-8c485a2a3347
+
+	measure 'LR RMSE' = ```
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    DimModel[model_name] = "LinearRegression",
+			    FactModelMetric[metric_name] = "test_rmse_true"
+			)
+			
+			```
+		formatString: #,0.000
+		displayFolder: 07 Model Performance
+		lineageTag: 248754cd-f137-4f62-a774-a9e7e3b42a12
+
+	measure 'Model RMSE' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "test_rmse_true",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: #,0.000
+		displayFolder: 07 Model Performance
+		lineageTag: dea2c755-cff5-40b4-86fa-f15dac7229cd
+
+	measure 'Model NASA Score' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "test_nasa_score",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: #,0.0
+		displayFolder: 07 Model Performance
+		lineageTag: b2a3a310-c240-4f27-84a5-d36ee3571b7e
+
+	measure 'Model Precision' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "test_precision",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0.00%
+		displayFolder: 07 Model Performance
+		lineageTag: a056ef9e-3308-4af7-82e6-932aa24ae06f
+
+	measure 'Model Recall' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "test_recall",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0.00%
+		displayFolder: 07 Model Performance
+		lineageTag: a0534dab-7d60-4f6a-b5dc-515a7e9f9312
+
+	measure 'Model F1' = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "test_f1",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0.00%
+		displayFolder: 07 Model Performance
+		lineageTag: a4121984-8795-4f15-a92d-9248e9c7d124
+
+	measure 'NASA Improvement %' = ```
+			
+			VAR LrNasa =
+			    CALCULATE (
+			        AVERAGE ( FactModelMetric[metric_value] ),
+			        DimModel[model_name] = "LinearRegression",
+			        FactModelMetric[metric_name] = "test_nasa_score"
+			    )
+			VAR XgbNasa =
+			    CALCULATE (
+			        AVERAGE ( FactModelMetric[metric_value] ),
+			        DimModel[model_name] = "XGBoost",
+			        FactModelMetric[metric_name] = "test_nasa_score"
+			    )
+			RETURN
+			DIVIDE ( LrNasa - XgbNasa, LrNasa, 0 )
+			
+			```
+		formatString: 0.00%
+		displayFolder: 07 Model Performance
+		lineageTag: 1e67a6ae-0533-46d3-845b-f8ae255dda24
+
+	measure TP = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "tp",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 07 Model Performance\Confusion
+		lineageTag: b16ff49c-07b0-4476-a486-431891a37596
+
+	measure FP = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "fp",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 07 Model Performance\Confusion
+		lineageTag: 9ee0f93e-3db5-4e2f-922b-fbaf45d4b436
+
+	measure FN = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "fn",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 07 Model Performance\Confusion
+		lineageTag: 5d1cf8ec-8948-4cdd-80c2-d818577522e9
+
+	measure TN = ```
+			
+			VAR FilteredML =
+			    CALCULATETABLE (
+			        VALUES ( DimModel[model_name] ),
+			        DimModel[model_name] IN { "XGBoost", "LinearRegression" }
+			    )
+			VAR ModelCount = COUNTROWS ( FilteredML )
+			VAR UseModel =
+			    IF (
+			        ModelCount = 0,
+			        BLANK (),
+			        IF (
+			            ModelCount = 1,
+			            MAXX ( FilteredML, DimModel[model_name] ),
+			            "XGBoost"
+			        )
+			    )
+			RETURN
+			IF (
+			    ISBLANK ( UseModel ),
+			    BLANK (),
+			
+			CALCULATE (
+			    AVERAGE ( FactModelMetric[metric_value] ),
+			    FactModelMetric[metric_name] = "tn",
+			    DimModel[model_name] = UseModel
+			)
+			)
+			
+			```
+		formatString: 0
+		displayFolder: 07 Model Performance\Confusion
+		lineageTag: 7ba78620-daf3-4afc-84d1-e047b830e81f
+
+	measure 'Engines by Health Bin' =
+			
+			DISTINCTCOUNT(FactEngineHealth[engine_key])
+		formatString: 0
+		lineageTag: c05bf622-02f6-4c53-9a04-61b2270a215f
+
+	measure 'Scheduling Labor Cost' =
+			
+			SUM(FactSchedule[est_cost])
+		lineageTag: eb990ecc-0408-4491-83be-7ce8de91cb11
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column1
+		dataType: string
+		lineageTag: c2a81016-8395-424d-b02d-b41a5db8151a
+		sourceColumn: Column1
+
+		changedProperty = IsHidden
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				  Source = #table(type table [Column1 = text], {})
+				in
+				  Source
+

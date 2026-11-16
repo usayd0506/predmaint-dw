@@ -1,0 +1,100 @@
+table FactAlert
+	lineageTag: 4c9f06fc-774a-4ff6-8a55-23b296c2da52
+
+	column alert_fact_key
+		dataType: int64
+		lineageTag: e7d28948-fd60-4058-a490-1a221ed99b44
+		summarizeBy: none
+		sourceColumn: alert_fact_key
+
+		changedProperty = IsHidden
+
+	column run_key
+		dataType: int64
+		lineageTag: 34e8a5e1-5858-4052-b483-9aa7f37b73b5
+		summarizeBy: none
+		sourceColumn: run_key
+
+		changedProperty = IsHidden
+
+	column engine_key
+		dataType: int64
+		lineageTag: 44597e05-e4ac-4571-878d-48d32da10027
+		summarizeBy: none
+		sourceColumn: engine_key
+
+		changedProperty = IsHidden
+
+	column date_key
+		dataType: int64
+		lineageTag: 3175c816-0cb1-49ba-86c9-7b39ec82f47c
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+	column alert_id
+		dataType: int64
+		lineageTag: 1fa2adca-cbc0-453d-9d65-f9e90325b1ae
+		summarizeBy: none
+		sourceColumn: alert_id
+
+		changedProperty = IsHidden
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b158bb10-e438-4233-979f-5ee7f9095738
+		sourceColumn: created_at
+
+		changedProperty = IsHidden
+
+	column severity
+		dataType: string
+		lineageTag: e8d93513-6315-415f-aafd-2e7e9a890c88
+		sourceColumn: severity
+
+		changedProperty = IsHidden
+
+	column recommended_action
+		dataType: string
+		lineageTag: 6dfdbae7-b18e-44d0-8e08-dbef002f7048
+		sourceColumn: recommended_action
+
+		changedProperty = IsHidden
+
+	column rules_fired
+		dataType: string
+		lineageTag: 194c6efe-f461-4cfc-af0a-56bad2fbfdf5
+		sourceColumn: rules_fired
+
+		changedProperty = IsHidden
+
+	column alert_count
+		dataType: int64
+		formatString: 0
+		lineageTag: c3b6e80a-df3f-4488-a06a-9c050161f124
+		sourceColumn: alert_count
+
+		changedProperty = IsHidden
+
+	partition FactAlert = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="FactAlert"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    )
+				in
+				    #"Removed Navigation"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

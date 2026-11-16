@@ -1,0 +1,214 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 336.2455292339742,
+        "y": 237.64720309806472
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1717.8494042700904,
+            "y": 749.0144437031762
+          },
+          "nodeIndex": "_Measures",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 622.67986016159455,
+            "y": 627.79644494430306
+          },
+          "nodeIndex": "DimDate",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 907.80083360450146,
+            "y": 466.39624037631881
+          },
+          "nodeIndex": "DimEngine",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 1036.1660631475652
+          },
+          "nodeIndex": "DimMethod",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1279.2427527894149,
+            "y": 1424.0288874063522
+          },
+          "nodeIndex": "DimModel",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 671.91547610183011,
+            "y": -50
+          },
+          "nodeIndex": "DimPlant",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1260.7778795747181,
+            "y": 894.89693407539608
+          },
+          "nodeIndex": "DimRun",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 154.16082281458148,
+            "y": 35.901627906377144
+          },
+          "nodeIndex": "DimTechnician",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1481.7198400123352,
+            "y": 541.62707001569811
+          },
+          "nodeIndex": "FactAlert",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1194.7644248980885,
+            "y": 197.96064728641591
+          },
+          "nodeIndex": "FactEngineHealth",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 441.11009373852244,
+            "y": 275.53683658947375
+          },
+          "nodeIndex": "FactMaintenance",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1483.8494042700904,
+            "y": 1171.7574079173396
+          },
+          "nodeIndex": "FactModelMetric",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 752.79492828628293,
+            "y": 981.354970951415
+          },
+          "nodeIndex": "FactRULPrediction",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 337.12549436589416,
+            "y": 856.00265662541324
+          },
+          "nodeIndex": "FactSchedule",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2001.8494042700904,
+            "y": 737.0144437031762
+          },
+          "nodeIndex": "GA_Convergence",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2285.8494042700904,
+            "y": 749.0144437031762
+          },
+          "nodeIndex": "RuleCatalog",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 63.287087723234038,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

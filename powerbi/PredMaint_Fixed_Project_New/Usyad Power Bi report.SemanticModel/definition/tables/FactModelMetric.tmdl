@@ -1,0 +1,62 @@
+table FactModelMetric
+	lineageTag: 372fa8fe-70d8-432e-a02a-ef17c8964f2c
+
+	column model_metric_fact_key
+		dataType: int64
+		lineageTag: 26c480a2-3a2f-417e-90f2-f4390baab857
+		summarizeBy: none
+		sourceColumn: model_metric_fact_key
+
+		changedProperty = IsHidden
+
+	column run_key
+		dataType: int64
+		lineageTag: d5bbe62e-347c-4d0a-9cae-9e1659ae10cf
+		summarizeBy: none
+		sourceColumn: run_key
+
+		changedProperty = IsHidden
+
+	column model_key
+		dataType: int64
+		lineageTag: fefd2477-f40b-4490-ac02-2d9fa08bd7d3
+		summarizeBy: none
+		sourceColumn: model_key
+
+		changedProperty = IsHidden
+
+	column metric_name
+		dataType: string
+		lineageTag: 5d738d4c-fb4b-46e7-ad4e-f007d8bf65f8
+		sourceColumn: metric_name
+
+		changedProperty = IsHidden
+
+	column metric_value
+		dataType: double
+		formatString: #,0.000
+		lineageTag: 01152eff-a5b1-455c-823f-3243e6c81915
+		sourceColumn: metric_value
+
+		changedProperty = IsHidden
+
+	partition FactModelMetric = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="FactModelMetric"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    )
+				in
+				    #"Removed Navigation"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

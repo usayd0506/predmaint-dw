@@ -1,0 +1,34 @@
+table GA_Convergence
+	lineageTag: d06832e4-ce55-4eaf-b46d-9d0ded59c8c4
+
+	column generation
+		dataType: int64
+		formatString: 0
+		lineageTag: e31fb919-331b-4395-9672-ae2831887e58
+		summarizeBy: none
+		sourceColumn: generation
+
+		changedProperty = IsHidden
+
+	column best_fitness
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 45d329a1-c8dc-40b8-854c-236ee7ff3f43
+		sourceColumn: best_fitness
+
+		changedProperty = IsHidden
+
+	partition GA_Convergence = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("D:\PredMainBackup\Usyad_Power_BI_Project_Shareable\PredMaint_Fixed_Project\Datasets\GA_Convergence.csv"),[Delimiter=",", Columns=2, QuoteStyle=QuoteStyle.None]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"generation", Int64.Type}, {"best_fitness", type number}}, "en-US")
+				in
+				  #"Changed column type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

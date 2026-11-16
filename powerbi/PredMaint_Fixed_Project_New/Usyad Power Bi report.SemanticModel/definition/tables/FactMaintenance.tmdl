@@ -1,0 +1,102 @@
+table FactMaintenance
+	lineageTag: 0363a3da-2320-494e-94f9-b7dc9c0684c5
+
+	column maintenance_fact_key
+		dataType: int64
+		lineageTag: f03a84ff-fd6f-4d20-bba8-aa9a51157437
+		summarizeBy: none
+		sourceColumn: maintenance_fact_key
+
+		changedProperty = IsHidden
+
+	column work_order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: b635b767-b1a5-4fd8-9a2a-047a81df551d
+		summarizeBy: none
+		sourceColumn: work_order_id
+
+		changedProperty = IsHidden
+
+	column engine_key
+		dataType: int64
+		lineageTag: 7ee69881-cb35-4442-a2a7-4d8b2b13fdbc
+		summarizeBy: none
+		sourceColumn: engine_key
+
+		changedProperty = IsHidden
+
+	column technician_key
+		dataType: int64
+		lineageTag: c9f86232-a6be-432a-aa16-8ffd0d30ea30
+		summarizeBy: none
+		sourceColumn: technician_key
+
+		changedProperty = IsHidden
+
+	column date_key
+		dataType: int64
+		lineageTag: eb9a64a7-2a9d-4cfe-bcec-0a151fc005a4
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+	column maintenance_type
+		dataType: string
+		lineageTag: 51734b27-8b8f-40f9-9779-dd6b740b629f
+		sourceColumn: maintenance_type
+
+		changedProperty = IsHidden
+
+	column duration_hours
+		dataType: double
+		formatString: 0.0
+		lineageTag: 85073e11-124b-45b1-8ed7-a8464707793a
+		sourceColumn: duration_hours
+
+		changedProperty = IsHidden
+
+	column maintenance_cost
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 24fdcb28-85f8-4f3e-817b-347e7f32d4a4
+		sourceColumn: maintenance_cost
+
+		changedProperty = IsHidden
+
+	column is_imputed
+		dataType: boolean
+		lineageTag: f03c6e21-e363-41d9-b33f-95f5cc4e394f
+		sourceColumn: is_imputed
+
+		changedProperty = IsHidden
+
+	column work_order_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 688fc457-ba5e-4173-bd58-d69ab23d4796
+		sourceColumn: work_order_count
+
+		changedProperty = IsHidden
+
+	partition FactMaintenance = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="FactMaintenance"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    )
+				in
+				    #"Removed Navigation"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

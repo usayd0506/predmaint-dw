@@ -1,0 +1,146 @@
+table FactEngineHealth
+	lineageTag: 43cb6b30-e55f-4eed-9b4c-01e13debada6
+
+	column health_fact_key
+		dataType: int64
+		lineageTag: cb7f80be-a203-4415-8618-ff7dbabb60e3
+		summarizeBy: none
+		sourceColumn: health_fact_key
+
+		changedProperty = IsHidden
+
+	column run_key
+		dataType: int64
+		lineageTag: c697d1ac-5e22-4be8-b247-c43df167d8bc
+		summarizeBy: none
+		sourceColumn: run_key
+
+		changedProperty = IsHidden
+
+	column engine_key
+		dataType: int64
+		lineageTag: 3d9aa339-2ced-458a-89ca-c92ea77c38e2
+		summarizeBy: none
+		sourceColumn: engine_key
+
+		changedProperty = IsHidden
+
+	column plant_key
+		dataType: int64
+		lineageTag: 1a0afc28-95f8-4280-9636-925ae0e07bf1
+		summarizeBy: none
+		sourceColumn: plant_key
+
+		changedProperty = IsHidden
+
+	column date_key
+		dataType: int64
+		lineageTag: 1060f106-2944-42e5-94d4-0d7b13218a54
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+	column cycles_run
+		dataType: int64
+		formatString: #,0
+		lineageTag: 487bef31-836b-4b14-a4b8-7bd8e013c6a5
+		sourceColumn: cycles_run
+
+		changedProperty = IsHidden
+
+	column last_maintenance
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: e5d5ba16-35c2-49f5-b7e9-2859354d00f6
+		summarizeBy: none
+		sourceColumn: last_maintenance
+
+		changedProperty = IsHidden
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column health_index
+		dataType: double
+		formatString: 0.0
+		lineageTag: 8e9ec3d2-728d-4e61-b089-b17be417e6da
+		sourceColumn: health_index
+
+		changedProperty = IsHidden
+
+	column degradation_stage
+		dataType: string
+		lineageTag: 81c84ad4-8cc7-44a9-8ebe-d2310cb20a05
+		sourceColumn: degradation_stage
+
+		changedProperty = IsHidden
+
+	column risk_level
+		dataType: string
+		lineageTag: 0494393c-aef7-4477-a5ca-b827528c3e30
+		sourceColumn: risk_level
+
+		changedProperty = IsHidden
+
+	column 'Health Index Bin' =
+			
+			VAR H = FactEngineHealth[health_index]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(H), BLANK(),
+			        H < 20, "00–19",
+			        H < 40, "20–39",
+			        H < 60, "40–59",
+			        H < 80, "60–79",
+			        "80–100"
+			    )
+		lineageTag: 528ec035-e48e-4184-b92a-0b60fd394cde
+		summarizeBy: none
+		sortByColumn: 'Health Index Bin Sort'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Health Index Bin Sort' =
+			
+			VAR H = FactEngineHealth[health_index]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(H), BLANK(),
+			        H < 20, 1,
+			        H < 40, 2,
+			        H < 60, 3,
+			        H < 80, 4,
+			        5
+			    )
+		formatString: 0
+		lineageTag: a522b7f0-f48f-4786-bbcf-472f819fec95
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactEngineHealth = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="FactEngineHealth"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    )
+				in
+				    #"Removed Navigation"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

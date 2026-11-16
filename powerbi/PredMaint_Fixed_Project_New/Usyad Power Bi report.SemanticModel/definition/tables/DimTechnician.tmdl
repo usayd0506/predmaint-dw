@@ -1,0 +1,82 @@
+table DimTechnician
+	lineageTag: 1f6835f4-6218-4209-8e06-75406cadfcd5
+
+	column technician_key
+		dataType: int64
+		lineageTag: 3c7acd21-1e72-4961-8c00-0455507af305
+		summarizeBy: none
+		sourceColumn: technician_key
+
+		changedProperty = IsHidden
+
+	column technician_id
+		dataType: int64
+		lineageTag: 2d7d93d7-a80c-4a05-a76d-048d15ffc0c7
+		summarizeBy: none
+		sourceColumn: technician_id
+
+		changedProperty = IsHidden
+
+	column technician_name
+		dataType: string
+		lineageTag: 0b14ed97-fc82-48ec-bfb5-91eb71d8e36a
+		sourceColumn: technician_name
+
+		changedProperty = IsHidden
+
+	column plant_id
+		dataType: int64
+		lineageTag: 56adaa20-32b5-4867-9a04-480eef2643ee
+		summarizeBy: none
+		sourceColumn: plant_id
+
+		changedProperty = IsHidden
+
+	column skill_level
+		dataType: string
+		lineageTag: 41f30b92-71c0-4247-8261-58be8a0e3cb3
+		sourceColumn: skill_level
+
+		changedProperty = IsHidden
+
+	column hourly_rate
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 5e8b9b25-e74d-4281-830c-dedcf3402c69
+		sourceColumn: hourly_rate
+
+		changedProperty = IsHidden
+
+	column max_hours_per_week
+		dataType: int64
+		formatString: 0
+		lineageTag: e77e4161-3c3b-4734-87b1-6218e3ca416e
+		sourceColumn: max_hours_per_week
+
+		changedProperty = IsHidden
+
+	partition DimTechnician = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    DimTechnician = Source{[Schema="mart", Item="DimTechnician"]}[Data],
+				    #"Selected Columns" = Table.SelectColumns(
+				        DimTechnician,
+				        {
+				            "technician_key",
+				            "technician_id",
+				            "technician_name",
+				            "plant_id",
+				            "skill_level",
+				            "hourly_rate",
+				            "max_hours_per_week"
+				        }
+				    )
+				in
+				    #"Selected Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

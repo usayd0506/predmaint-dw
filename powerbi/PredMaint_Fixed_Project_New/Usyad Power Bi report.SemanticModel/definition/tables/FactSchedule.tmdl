@@ -1,0 +1,131 @@
+table FactSchedule
+	lineageTag: a7b90d46-579f-4cff-81ee-a895c92db5dd
+
+	column schedule_fact_key
+		dataType: int64
+		lineageTag: 1502c646-1aa8-47ed-9361-4f1abe1a561f
+		summarizeBy: none
+		sourceColumn: schedule_fact_key
+
+		changedProperty = IsHidden
+
+	column run_key
+		dataType: int64
+		lineageTag: 6ac659b7-d31a-40db-8643-c04d1720ed01
+		summarizeBy: none
+		sourceColumn: run_key
+
+		changedProperty = IsHidden
+
+	column engine_key
+		dataType: int64
+		lineageTag: a29f37ef-a52e-4e80-bacc-493a0d7ae400
+		summarizeBy: none
+		sourceColumn: engine_key
+
+		changedProperty = IsHidden
+
+	column technician_key
+		dataType: int64
+		lineageTag: 62003863-16fd-42c9-bf75-eb91a01d1e86
+		summarizeBy: none
+		sourceColumn: technician_key
+
+		changedProperty = IsHidden
+
+	column method_key
+		dataType: int64
+		lineageTag: 66e6ea6c-402f-4416-900b-e0e90c14f5d1
+		summarizeBy: none
+		sourceColumn: method_key
+
+		changedProperty = IsHidden
+
+	column date_key
+		dataType: int64
+		lineageTag: 5d7025ae-3e6c-4290-be16-fc5a2682737c
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+	column schedule_id
+		dataType: int64
+		lineageTag: 43832b4d-28ed-4625-bbdf-3bf57468f833
+		summarizeBy: none
+		sourceColumn: schedule_id
+
+		changedProperty = IsHidden
+
+	column slot_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 432927c1-9fbd-410d-97d7-a521a283dce1
+		sourceColumn: slot_start
+
+		changedProperty = IsHidden
+
+	column slot_hours
+		dataType: double
+		formatString: 0
+		lineageTag: 519c4ae9-db4f-46b2-86a6-2c9235d13ef1
+		summarizeBy: sum
+		sourceColumn: slot_hours
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column est_cost
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: da669c9c-2192-4452-9d92-d341f820bf7a
+		sourceColumn: est_cost
+
+		changedProperty = IsHidden
+
+	column assignment_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 22a0ebdf-31c2-40ab-b6ea-769ce02713d1
+		sourceColumn: assignment_count
+
+		changedProperty = IsHidden
+
+	column 'Schedule Date' =
+			
+			DATE(
+			    YEAR(FactSchedule[slot_start]),
+			    MONTH(FactSchedule[slot_start]),
+			    DAY(FactSchedule[slot_start])
+			)
+		formatString: General Date
+		lineageTag: 8e7b66d1-0bd5-49c4-81fe-15dc55b519a9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactSchedule = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="FactSchedule"]}[Data],
+				    #"Removed Navigation" = Table.RemoveColumns(
+				        Data,
+				        List.Select(
+				            Table.ColumnNames(Data),
+				            each Text.StartsWith(_, "mart.")
+				        )
+				    ),
+				    #"Changed Type" = Table.TransformColumnTypes(
+				        #"Removed Navigation",
+				        {{"slot_hours", type number}}
+				    )
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

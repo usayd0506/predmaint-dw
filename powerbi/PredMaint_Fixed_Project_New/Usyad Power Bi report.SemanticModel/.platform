@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Usyad Power Bi report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e058fcb2-05d7-42b4-8b8b-8b76e495ab55"
+  }
+}

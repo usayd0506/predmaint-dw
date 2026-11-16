@@ -1,0 +1,162 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "793124361282a8c0a1d6",
+  "position": {
+    "x": 270,
+    "y": 660,
+    "z": 14000,
+    "height": 360,
+    "width": 850,
+    "tabOrder": 14000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimEngine"
+                    }
+                  },
+                  "Property": "engine_key"
+                }
+              },
+              "queryRef": "DimEngine.engine_key",
+              "nativeQueryRef": "engine_key"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAlert"
+                    }
+                  },
+                  "Property": "severity"
+                }
+              },
+              "queryRef": "FactAlert.severity",
+              "nativeQueryRef": "severity"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAlert"
+                    }
+                  },
+                  "Property": "rules_fired"
+                }
+              },
+              "queryRef": "FactAlert.rules_fired",
+              "nativeQueryRef": "rules_fired"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAlert"
+                    }
+                  },
+                  "Property": "recommended_action"
+                }
+              },
+              "queryRef": "FactAlert.recommended_action",
+              "nativeQueryRef": "recommended_action"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimEngine"
+                  }
+                },
+                "Property": "engine_key"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "369D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "FactAlert.recommended_action"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "273D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "FactAlert.rules_fired"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "131D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "FactAlert.severity"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "126D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "DimEngine.engine_key"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

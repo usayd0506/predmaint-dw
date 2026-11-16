@@ -1,0 +1,40 @@
+table DimModel
+	lineageTag: c1179e54-ffae-4ded-b669-bca2a3c480ca
+
+	column model_key
+		dataType: int64
+		lineageTag: 21b178a8-f9dc-4d33-9c11-ebc10a462a8d
+		summarizeBy: none
+		sourceColumn: model_key
+
+		changedProperty = IsHidden
+
+	column model_name
+		dataType: string
+		lineageTag: ff95ecb3-9b43-4760-9b61-5ad3f97ff5fb
+		sourceColumn: model_name
+
+		changedProperty = IsHidden
+
+	partition DimModel = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("USAYD-PC\SQLEXPRESS", "PredMaintDW"),
+				    Data = Source{[Schema="mart", Item="DimModel"]}[Data],
+				    #"Selected Columns" = Table.SelectColumns(
+				        Data,
+				        Table.ColumnNames(
+				            Table.RemoveColumns(
+				                Data,
+				                Table.ColumnsOfType(Data, {type table})
+				            )
+				        )
+				    )
+				in
+				    #"Selected Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

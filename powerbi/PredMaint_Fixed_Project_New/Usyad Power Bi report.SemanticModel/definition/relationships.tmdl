@@ -1,0 +1,94 @@
+relationship d128476e-3b4d-45b2-bf04-a369b4d7128d
+	fromColumn: FactEngineHealth.engine_key
+	toColumn: DimEngine.engine_key
+
+relationship 4f9fbe86-e2e6-46ee-a47d-60dc7bd83f36
+	fromColumn: FactRULPrediction.engine_key
+	toColumn: DimEngine.engine_key
+
+relationship 14e9df2a-0486-46c7-893b-a9bc6ca83cc6
+	fromColumn: FactAlert.engine_key
+	toColumn: DimEngine.engine_key
+
+relationship 18552adf-96ad-4bd1-b591-3fc2d6c22741
+	fromColumn: FactMaintenance.engine_key
+	toColumn: DimEngine.engine_key
+
+relationship c6d0f764-178a-4054-b827-59c7eb4fc3a5
+	fromColumn: FactSchedule.engine_key
+	toColumn: DimEngine.engine_key
+
+relationship a0058c40-1da6-4302-b928-bad3769a85df
+	fromColumn: DimEngine.plant_id
+	toColumn: DimPlant.plant_id
+
+relationship 9c1ec421-4762-43fd-9b3b-a7bd6f168792
+	fromColumn: FactMaintenance.technician_key
+	toColumn: DimTechnician.technician_key
+
+relationship 91db8289-0b2f-472d-876c-ac5c7b86adef
+	fromColumn: FactSchedule.technician_key
+	toColumn: DimTechnician.technician_key
+
+relationship 6525edeb-8505-4fad-b6eb-9ff551f8f54b
+	fromColumn: FactRULPrediction.model_key
+	toColumn: DimModel.model_key
+
+relationship 3efb3459-38f0-4ef1-865d-6bef3336df6e
+	fromColumn: FactModelMetric.model_key
+	toColumn: DimModel.model_key
+
+relationship d64ab928-32d1-4990-8c67-ed35aea9703c
+	fromColumn: FactSchedule.method_key
+	toColumn: DimMethod.method_key
+
+relationship 4c8238c4-c16b-4842-832c-4fe33b54986c
+	fromColumn: FactEngineHealth.date_key
+	toColumn: DimDate.date_key
+
+relationship c927e8eb-91fd-4e70-9efd-ae716dd35b71
+	fromColumn: FactRULPrediction.date_key
+	toColumn: DimDate.date_key
+
+relationship 4f81a155-46fe-4b8b-be33-7f858a107baf
+	fromColumn: FactAlert.date_key
+	toColumn: DimDate.date_key
+
+relationship 5dd7f40e-f812-426b-a5da-19422f16ea15
+	fromColumn: FactMaintenance.date_key
+	toColumn: DimDate.date_key
+
+relationship 809d95f6-b34c-4837-9d95-4f9aece9c683
+	fromColumn: FactSchedule.date_key
+	toColumn: DimDate.date_key
+
+relationship 6ef20f66-a3cd-40a8-99c8-f8041c8f1612
+	fromColumn: FactEngineHealth.run_key
+	toColumn: DimRun.run_key
+
+relationship 72529918-ae85-45d1-9a14-14151bc3d3b8
+	fromColumn: FactRULPrediction.run_key
+	toColumn: DimRun.run_key
+
+relationship b3c22c34-e65f-4588-a367-f5f554c75a30
+	fromColumn: FactAlert.run_key
+	toColumn: DimRun.run_key
+
+relationship 1ca49958-8af3-4514-8e41-d9a3cd5a8260
+	fromColumn: FactModelMetric.run_key
+	toColumn: DimRun.run_key
+
+relationship dba1a038-cc45-4d18-84b7-e858c5c70917
+	fromColumn: FactSchedule.run_key
+	toColumn: DimRun.run_key
+
+relationship 55f33816-ce74-43bd-ad0f-79217dd8e566
+	isActive: false
+	fromColumn: DimTechnician.plant_id
+	toColumn: DimPlant.plant_id
+
+relationship faea1fda-25ef-4969-a240-96b923475b1a
+	isActive: false
+	fromColumn: FactEngineHealth.plant_key
+	toColumn: DimPlant.plant_key
+
